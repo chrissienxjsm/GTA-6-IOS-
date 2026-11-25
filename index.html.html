@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Leonida">
+<meta name="theme-color" content="#000000"><title>Leonida (Unofficial Fan Project)</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff;font-family:"Avenir Next",Futura,"Trebuchet MS",sans-serif;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#pl,#pl iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none}
+#title{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(#12041f 0%,#5a1a7a 38%,#ff4f93 66%,#ffb15c 78%,#1a0630 78.1%);transition:opacity .8s}
+#title.off{opacity:0;pointer-events:none}
+#sun{position:absolute;left:50%;top:44%;width:34vmin;height:34vmin;margin-left:-17vmin;border-radius:50%;background:linear-gradient(#ffe36e,#ff3c8e);-webkit-mask:repeating-linear-gradient(#000 0 7%,transparent 7% 9%);mask:repeating-linear-gradient(#000 0 7%,transparent 7% 9%);-webkit-mask-size:100% 100%;opacity:.9}
+.palm{position:absolute;bottom:20%;height:46vh;width:auto}
+h1{position:relative;margin:0;font-size:clamp(44px,12vw,130px);letter-spacing:.12em;font-weight:900;color:#fff;text-shadow:0 0 12px #ff3c8e,0 0 40px #ff3c8e,0 0 90px #8a3dff}
+.sub{position:relative;letter-spacing:.35em;font-size:clamp(10px,1.6vw,16px);opacity:.85;margin:6px 0 28px;text-align:center}
+#start{position:relative;font:inherit;color:#fff;letter-spacing:.4em;font-size:20px;padding:14px 46px 14px 52px;border:2px solid #fff;border-radius:4px;background:rgba(0,0,0,.35);animation:bl 1.6s infinite}
+#start:active{background:#ff3c8e}
+@keyframes bl{50%{opacity:.45}}
+#cover{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;z-index:20;transition:opacity .6s}
+#cover.hide{opacity:0;pointer-events:none}
+#go{display:none;font:inherit;color:#fff;letter-spacing:.2em;padding:14px 34px;border:2px solid #ff3c8e;border-radius:999px;background:rgba(255,60,142,.18)}
+#msg{font-size:15px;opacity:.85;max-width:440px}
+#world{position:fixed;top:0;left:0;right:0;bottom:0;display:none;z-index:15;background:#000}
+#cv{width:100%;height:100%;display:block}
+#joy{position:absolute;left:calc(34px + env(safe-area-inset-left));bottom:calc(34px + env(safe-area-inset-bottom));width:140px;height:140px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,255,255,.08)}
+#knob{position:absolute;left:45px;top:45px;width:50px;height:50px;border-radius:50%;background:rgba(255,60,142,.75)}
+#hint{position:absolute;top:calc(14px + env(safe-area-inset-top));left:0;right:0;text-align:center;font-size:13px;opacity:.85;pointer-events:none;transition:opacity 1s}
+#note{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:11px;opacity:.45;z-index:30;pointer-events:none}
+</style></head><body>
+<div id="pl"></div>
+<div id="title">
+<svg width="0" height="0" style="position:absolute"><symbol id="pm" viewBox="-5 0 120 160"><g fill="#0d0518"><path d="M50 160C52 110 48 70 56 30" stroke="#0d0518" stroke-width="5" fill="none"/><path d="M56 30C30 5 8 20 0 48C22 28 40 28 56 30Z"/><path d="M56 30C80 5 102 20 110 48C88 28 70 28 56 30Z"/><path d="M56 30C36 0 66-8 56 30Z"/><path d="M56 30C20 30 5 60 8 80C24 55 40 42 56 30Z"/><path d="M56 30C92 30 108 60 104 80C88 55 72 42 56 30Z"/></g></symbol></svg>
+<div id="sun"></div>
+<svg class="palm" style="left:4%" viewBox="-5 0 120 160"><use href="#pm"/></svg>
+<svg class="palm" style="left:14%;height:34vh" viewBox="-5 0 120 160"><use href="#pm"/></svg>
+<svg class="palm" style="right:5%" viewBox="-5 0 120 160"><use href="#pm"/></svg>
+<svg class="palm" style="right:15%;height:36vh" viewBox="-5 0 120 160"><use href="#pm"/></svg>
+<h1>LEONIDA</h1><div class="sub">A FAN-MADE CINEMATIC EXPERIENCE</div><button id="start">START</button></div>
+<div id="cover" class="hide"><div id="msg"></div><button id="go">CONTINUE</button></div>
+<div id="world"><canvas id="cv"></canvas><div id="joy"><div id="knob"></div></div><div id="hint">Left stick: move &nbsp;·&nbsp; Drag the right side: look around &nbsp;·&nbsp; Original fan-made world</div></div>
+<div id="note">Unofficial fan project. Not affiliated with Rockstar Games.</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var IDS=['rz1B4B2yBZY','l4ukT5Ie-Go','R97EoVD1nr4'],i=0,P=null,ready=false,failed=false,iv=null,gt=null,adv=false,tapAct=null;
+function $(s){return document.getElementById(s)}
+var ys=document.createElement('script');ys.src='https://www.youtube.com/iframe_api';ys.onerror=function(){failed=true};document.head.appendChild(ys);
+window.onYouTubeIframeAPIReady=function(){ready=true};
+function black(){$('go').style.display='none';$('msg').textContent='';$('cover').className=''}
+function hideCover(){$('cover').className='hide'}
+function prompt2(t,fn){tapAct=fn;$('msg').textContent=t;$('go').style.display='block';$('cover').className=''}
+$('go').onclick=function(){var f=tapAct;tapAct=null;$('go').style.display='none';$('msg').textContent='';if(f)f()};
+$('start').onclick=function(){$('title').classList.add('off');black();begin()};
+function begin(){black();var n=0,w=setInterval(function(){if(ready){clearInterval(w);mk()}else if(failed||++n>100){clearInterval(w);prompt2('Could not load YouTube. Check your connection, then tap to retry.',begin)}},100)}
+function mk(){P=new YT.Player('pl',{videoId:IDS[0],playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,cc_load_policy:0,enablejsapi:1},
+ events:{onReady:function(e){e.target.unMute();e.target.setVolume(100);e.target.playVideo();guard()},onStateChange:st,onError:err}});iv=setInterval(tick,300)}
+function guard(){clearTimeout(gt);gt=setTimeout(function(){if(!P||!P.getPlayerState)return;var s=P.getPlayerState();
+ if(s!==1&&s!==3)prompt2('Tap to continue with sound',function(){P.unMute();P.setVolume(100);P.playVideo();guard()});
+ else if(P.isMuted&&P.isMuted())prompt2('Tap to turn the sound on',function(){P.unMute();P.setVolume(100);hideCover()})},2500)}
+function play(n){i=n;adv=false;P.loadVideoById(IDS[n]);P.unMute();P.setVolume(100);guard()}
+function st(e){if(e.data===1){hideCover();try{P.unMute();P.setVolume(100);P.unloadModule('captions')}catch(x){}}
+ if(e.data===2&&!document.hidden){setTimeout(function(){if(P.getPlayerState()===2)P.playVideo()},150)}
+ if(e.data===0)next()}
+function tick(){if(P&&P.getPlayerState&&P.getPlayerState()===1&&!adv){var d=P.getDuration(),t=P.getCurrentTime();if(d>5&&t>=d-.7)next()}}
+function next(){if(adv)return;adv=true;black();setTimeout(function(){if(i<IDS.length-1)play(i+1);else toWorld()},650)}
+function err(){prompt2('This video is unavailable. Tap to continue.',function(){adv=false;next()})}
+function toWorld(){clearInterval(iv);clearTimeout(gt);try{P.stopVideo();P.destroy()}catch(x){}P=null;world()}
+// ---------- explorable 3D world (original, not from the game) ----------
+function world(){
+ $('world').style.display='block';
+ if(!window.THREE){prompt2('The 3D world could not load. Check your connection and reload.',function(){location.reload()});return}
+ try{
+ var T=THREE,cv=$('cv'),r=new T.WebGLRenderer({canvas:cv,antialias:true});r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+ var sc=new T.Scene(),sky=0xff7aa8;sc.background=new T.Color(sky);sc.fog=new T.Fog(sky,40,300);
+ var cam=new T.PerspectiveCamera(70,1,.1,600);cam.rotation.order='YXZ';
+ sc.add(new T.HemisphereLight(0xffc9e8,0x3a1b5e,.95));
+ var sun=new T.DirectionalLight(0xffb36b,.8);sun.position.set(-50,40,-80);sc.add(sun);
+ var sd=new T.Mesh(new T.SphereGeometry(24,24,16),new T.MeshBasicMaterial({color:0xffe36e,fog:false}));sd.position.set(-90,30,-260);sc.add(sd);
+ function pl(w,h,x,y,z,col,em){var m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshStandardMaterial({color:col,roughness:.9,emissive:em||0x000000}));m.rotation.x=-Math.PI/2;m.position.set(x,y,z);sc.add(m);return m}
+ var sea=pl(1200,1200,0,-.3,0,0x17a2c4);sea.material.roughness=.25;
+ pl(340,620,130,0,0,0xf0c890);pl(14,620,40,.02,0,0x2a2438);
+ for(var z=-300;z<300;z+=12)pl(.4,5,40,.04,z,0xffffff,0xffffff);
+ function tex(pal,w,h){var c=document.createElement('canvas');c.width=64;c.height=128;var x=c.getContext('2d');x.fillStyle='#120a22';x.fillRect(0,0,64,128);
+  for(var a=0;a<8;a++)for(var b=0;b<16;b++)if(Math.random()<.55){x.fillStyle=pal[Math.floor(Math.random()*pal.length)];x.fillRect(a*8+2,b*8+2,4,5)}
+  var t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(Math.max(1,w/8),Math.max(1,h/16));return t}
+ var pals=[['#ffd27a','#ff6fa8','#fff1c9'],['#6ff5ff','#c28bff','#fff1c9'],['#ff9a4d','#ffd27a','#ff6fa8']];
+ for(var k=0;k<70;k++){var w=10+Math.random()*12,h=20+Math.random()*70,d=10+Math.random()*12,x=70+Math.random()*190,z2=-270+Math.random()*540,t=tex(pals[k%3],w,h);
+  var b=new T.Mesh(new T.BoxGeometry(w,h,d),new T.MeshStandardMaterial({color:0x2b1745,map:t,emissive:0xffffff,emissiveMap:t,emissiveIntensity:.7,roughness:.7}));b.position.set(x,h/2,z2);sc.add(b)}
+ var tm=new T.MeshStandardMaterial({color:0x6b4423}),lm=new T.MeshStandardMaterial({color:0x2fbf71,side:T.DoubleSide});
+ function palm(x,z){var g=new T.Group(),tr=new T.Mesh(new T.CylinderGeometry(.25,.4,7,6),tm);tr.position.y=3.5;g.add(tr);
+  for(var q=0;q<7;q++){var p=new T.Object3D();p.position.y=7;p.rotation.y=q*Math.PI*2/7;p.rotation.x=.45;var l=new T.Mesh(new T.BoxGeometry(1.2,.05,4.5),lm);l.position.z=2.25;p.add(l);g.add(p)}
+  g.position.set(x,0,z);g.rotation.y=Math.random()*6;sc.add(g)}
+ for(var z3=-290;z3<=290;z3+=16){palm(28,z3+Math.random()*4);palm(54,z3+8);if(z3%32===0)palm(-10+Math.random()*30,z3)}
+ var yaw=0,pit=0,jx=0,jy=0,px=28,pz=240,jid=null,lid=null,lx=0,ly=0;
+ function size(){var w=innerWidth,h=innerHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}size();addEventListener('resize',size);
+ var joy=$('joy'),kn=$('knob');
+ function jm(t){var b=joy.getBoundingClientRect(),dx=t.clientX-(b.left+70),dy=t.clientY-(b.top+70),m=Math.min(1,Math.hypot(dx,dy)/60),a=Math.atan2(dy,dx);jx=Math.cos(a)*m;jy=Math.sin(a)*m;kn.style.transform='translate('+jx*45+'px,'+jy*45+'px)'}
+ function jr(){jx=jy=0;jid=null;kn.style.transform=''}
+ joy.addEventListener('touchstart',function(e){e.preventDefault();jid=e.changedTouches[0].identifier;jm(e.changedTouches[0])},{passive:false});
+ joy.addEventListener('touchmove',function(e){e.preventDefault();for(var n=0;n<e.changedTouches.length;n++)if(e.changedTouches[n].identifier===jid)jm(e.changedTouches[n])},{passive:false});
+ joy.addEventListener('touchend',jr);joy.addEventListener('touchcancel',jr);
+ cv.addEventListener('touchstart',function(e){e.preventDefault();var t=e.changedTouches[0];if(lid===null){lid=t.identifier;lx=t.clientX;ly=t.clientY}},{passive:false});
+ cv.addEventListener('touchmove',function(e){e.preventDefault();for(var n=0;n<e.changedTouches.length;n++){var t=e.changedTouches[n];if(t.identifier===lid){yaw-=(t.clientX-lx)*.005;pit=Math.max(-1.2,Math.min(1.2,pit-(t.clientY-ly)*.005));lx=t.clientX;ly=t.clientY}}},{passive:false});
+ cv.addEventListener('touchend',function(){lid=null});cv.addEventListener('touchcancel',function(){lid=null});
+ var last=performance.now();
+ function loop(now){var dt=Math.min(.05,(now-last)/1000);last=now;var f=-jy*9*dt,s=jx*9*dt;
+  px+=-Math.sin(yaw)*f+Math.cos(yaw)*s;pz+=-Math.cos(yaw)*f-Math.sin(yaw)*s;px=Math.max(-30,Math.min(290,px));pz=Math.max(-290,Math.min(290,pz));
+  cam.position.set(px,1.7,pz);cam.rotation.y=yaw;cam.rotation.x=pit;r.render(sc,cam);requestAnimationFrame(loop)}
+ requestAnimationFrame(loop);hideCover();setTimeout(function(){$('hint').style.opacity=0},9000);
+ }catch(e){prompt2('3D world error: '+e.message,function(){location.reload()})}
+}
+</script></body></html>
